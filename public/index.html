@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>Giám sát nhiệt độ ESP32</title>
+<style>
+body {
+  font-family: Arial;
+  background: #f4f6f8;
+  padding: 20px;
+}
+.card {
+  background: #fff;
+  padding: 20px;
+  margin: 10px;
+  border-radius: 10px;
+  width: 260px;
+  display: inline-block;
+  box-shadow: 0 0 10px rgba(0,0,0,0.1);
+}
+.value {
+  font-size: 36px;
+  color: #e74c3c;
+}
+</style>
+</head>
+<body>
+
+<h2>Giám sát nhiệt độ GY-906 (ESP-NOW → 4G)</h2>
+
+<div id="nodes"></div>
+
+<script>
+async function loadData() {
+  const res = await fetch("/api/data");
+  const d = await res.json();
+
+  let html = "";
+  for (let i = 1; i <= 3; i++) {
+    html += `
+      <div class="card">
+        <h3>Node ${i}</h3>
+        <div class="value">${d[i].obj} °C</div>
+        <p>Nhiệt độ môi trường: ${d[i].amb} °C</p>
+      </div>
+    `;
+  }
+
+  document.getElementById("nodes").innerHTML = html;
+}
+
+setInterval(loadData, 2000);
+loadData();
+</script>
+
+</body>
+</html>
