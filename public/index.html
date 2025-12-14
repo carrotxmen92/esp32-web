@@ -1,35 +1,49 @@
 <!DOCTYPE html>
 <html lang="vi">
 <head>
-  <meta charset="UTF-8">
-  <title>ESP32 Sensor Monitor</title>
+  <meta charset="UTF-8" />
+  <title>ESP32 Temperature Monitor</title>
+
   <style>
     body {
+      background: #020617;
       font-family: Arial;
-      background: #0f172a;
       color: #e5e7eb;
       text-align: center;
       padding-top: 50px;
     }
-    .card {
-      background: #1e293b;
-      padding: 20px;
-      width: 300px;
+
+    .box {
+      background: #0f172a;
+      width: 320px;
       margin: auto;
-      border-radius: 10px;
+      padding: 25px;
+      border-radius: 12px;
       box-shadow: 0 0 20px #000;
     }
+
     h2 { color: #38bdf8; }
+
+    p {
+      font-size: 18px;
+      margin: 8px 0;
+    }
+
+    .time {
+      font-size: 14px;
+      color: #94a3b8;
+    }
   </style>
 </head>
+
 <body>
 
-  <div class="card">
-    <h2>🌡 ESP32 NODE</h2>
-    <p>ID: <span id="node">--</span></p>
-    <p>Object: <b><span id="obj">--</span> °C</b></p>
-    <p>Ambient: <b><span id="amb">--</span> °C</b></p>
-    <p>⏱ <span id="time">--</span></p>
+  <div class="box">
+    <h2>🌡 ESP32 SENSOR</h2>
+    <p>Node ID: <b id="node">--</b></p>
+    <p>Object: <b id="obj">--</b> °C</p>
+    <p>Ambient: <b id="amb">--</b> °C</p>
+    <p class="time">Updated: <span id="time">--</span></p>
   </div>
 
 <script>
@@ -41,17 +55,20 @@ async function loadData() {
     if (!data.node_id) return;
 
     document.getElementById("node").innerText = data.node_id;
-    document.getElementById("obj").innerText = data.temp_obj.toFixed(2);
-    document.getElementById("amb").innerText = data.temp_amb.toFixed(2);
+    document.getElementById("obj").innerText =
+      Number(data.temp_obj).toFixed(2);
+    document.getElementById("amb").innerText =
+      Number(data.temp_amb).toFixed(2);
+
     document.getElementById("time").innerText =
-      new Date().toLocaleTimeString();
+      new Date(data.time).toLocaleTimeString();
 
   } catch (e) {
-    console.error(e);
+    console.error("Fetch error:", e);
   }
 }
 
-// 🔁 Refresh mỗi 2 giây
+/* Refresh mỗi 2 giây */
 setInterval(loadData, 2000);
 </script>
 
