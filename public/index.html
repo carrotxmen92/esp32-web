@@ -1,55 +1,63 @@
 <!DOCTYPE html>
-<html>
+<html lang="vi">
 <head>
-<meta charset="utf-8">
-<title>Giám sát nhiệt độ ESP32</title>
-<style>
-body {
-  font-family: Arial;
-  background: #f4f6f8;
-  padding: 20px;
-}
-.card {
-  background: #fff;
-  padding: 20px;
-  margin: 10px;
-  border-radius: 10px;
-  width: 260px;
-  display: inline-block;
-  box-shadow: 0 0 10px rgba(0,0,0,0.1);
-}
-.value {
-  font-size: 36px;
-  color: #e74c3c;
-}
-</style>
+  <meta charset="UTF-8">
+  <title>ESP32 Temperature Monitor</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f4f6f8;
+      padding: 20px;
+    }
+    h1 {
+      color: #333;
+    }
+    .node {
+      background: #fff;
+      padding: 15px;
+      margin-bottom: 10px;
+      border-radius: 8px;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    }
+  </style>
 </head>
 <body>
 
-<h2>Giám sát nhiệt độ GY-906 (ESP-NOW → 4G)</h2>
+<h1>🌡️ Giám sát nhiệt độ ESP32</h1>
 
-<div id="nodes"></div>
+<div id="nodes">Đang chờ dữ liệu...</div>
 
 <script>
 async function loadData() {
-  const res = await fetch("/api/data");
-  const d = await res.json();
+  try {
+    const res = await fetch('/api/data');
+    const data = await res.json();
 
-  let html = "";
-  for (let i = 1; i <= 3; i++) {
-    html += `
-      <div class="card">
-        <h3>Node ${i}</h3>
-        <div class="value">${d[i].obj} °C</div>
-        <p>Nhiệt độ môi trường: ${d[i].amb} °C</p>
-      </div>
+    const container = document.getElementById('nodes');
+    container.innerHTML = '';
+
+    if (!data || Object.keys(data).length === 0) {
+      container.innerHTML = 'Chưa có dữ liệu';
+      return;
+    }
+
+    // Nếu server chỉ lưu 1 node
+    const nodeDiv = document.createElement('div');
+    nodeDiv.className = 'node';
+    nodeDiv.innerHTML = `
+      <b>Node:</b> ${data.node_id ?? 'N/A'}<br>
+      <b>Nhiệt độ vật:</b> ${data.temp_obj ?? '--'} °C<br>
+      <b>Nhiệt độ môi trường:</b> ${data.temp_amb ?? '--'} °C
     `;
-  }
+    container.appendChild(nodeDiv);
 
-  document.getElementById("nodes").innerHTML = html;
+  } catch (err) {
+    console.error(err);
+  }
 }
 
-setInterval(loadData, 2000);
+// Load mỗi 3 giây
+setInterval(loadData, 3000);
 loadData();
 </script>
 
